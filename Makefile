@@ -44,8 +44,8 @@ SRC_PATH     = src
 
 ROOT = malloc.c
 
-FUNCTIONS = memory_block.c ft_itoa_base.c
-#ft_strnew.c
+FUNCTIONS = memory_block.c ft_itoa_base.c ft_strlen.c ft_strrev.c ft_putchar.c\
+ft_memcpy.c ft_putendl.c ft_putstr.c
 
 SRC = $(ROOT) $(FUNCTIONS)
 OBJ=$(SRC:%.c=%.o)
@@ -65,8 +65,10 @@ vpath %.h $(HEADERS_PATH)
 
 all: $(NAME)
 
-$(NAME): make_libs $(OBJ)
-	$(CC) $(FLAGS) $(LIB_FLAG) -o $(NAME_HOST_TYPE) $(OBJ) $(INC) $(LIBS); \
+#$(NAME): make_libs $(OBJ)
+$(NAME): $(OBJ)
+	#$(CC) $(FLAGS) $(LIB_FLAG) -o $(NAME_HOST_TYPE) $(OBJ) $(INC) $(LIBS);
+	$(CC) $(FLAGS) $(LIB_FLAG) -o $(NAME_HOST_TYPE) $(OBJ) $(INC); \
 	rm -f $(OBJ); \
 	rm -f $(NAME); \
 	ln -s $(NAME_HOST_TYPE) $(NAME); \

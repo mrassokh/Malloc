@@ -7,6 +7,7 @@ int main()
 	char *addr;
 
 	i = 0;
+
 	while (i < 1024)
 	{
 		addr = (char*)malloc(1024);

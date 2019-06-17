@@ -20,6 +20,20 @@ t_block 	**memory_list()
 	return (&memory_list);
 }
 
+t_block 	**tiny_segment()
+{
+	static t_block *tiny_segment;
+
+	return (&tiny_segment);
+}
+
+t_block 	**small_segment()
+{
+	static t_block *small_segment;
+
+	return (&small_segment);
+}
+
 t_block 				**memory_list_end()
 {
 	static t_block *memory_list_end;
@@ -43,10 +57,16 @@ ft_putstr("realloc\n");
 		return NULL;
 	alligned_size = align8(size);
 	curr_block = GET_BLOCK_POINTER(ptr);//get_block(ptr);
-	if (curr_block->magic != 123)
+		ft_putstr("realloc_in_0_0\n");
+	if (curr_block->magic != 123 && curr_block->magic != 456){
+				//ft_putstr("curr_block->magic != 123 || curr_block->magic != 456\n");
+				//printf("curr_block->magic %d\n", curr_block->magic );
 		return NULL;
+	}
+	ft_putstr("realloc_in_0\n");
 	if (curr_block->size < alligned_size)
 	{
+		ft_putstr("realloc_in\n");
 		if (curr_block->next && curr_block->next->is_free
 			&& curr_block->next->size + curr_block->size + BLOCK_SIZE >= alligned_size)
 			{
@@ -92,18 +112,36 @@ ft_putstr("realloc\n");
 		return ptr;
 }
 
+void		split_free_page(t_block *memory, size_t size)
+{
+	t_block *new_memory_block;
+
+
+	if (size > getpagesize() - BLOCK_SIZE)
+		return;
+	new_memory_block = MEMORY_DATA(memory) + size;
+	new_memory_block->size = getpagesize() - BLOCK_SIZE - size;
+	new_memory_block->next = memory->next;
+	new_memory_block->prev = memory;
+	new_memory_block->is_free = 1;
+	new_memory_block->magic = memory->magic;
+	memory->size = size;
+	memory->next = new_memory_block;
+	if (new_memory_block->next)
+		new_memory_block->next->prev = new_memory_block;
+}
+
 void		split_free_block(t_block *memory, size_t size)
 {
 	t_block *new_memory_block;
 
-	//ft_putstr("find_free_block_start!\n");
-		ft_putstr("split_free_block\n");
+
 	new_memory_block = MEMORY_DATA(memory) + size;
 	new_memory_block->size = memory->size - BLOCK_SIZE - size;
 	new_memory_block->next = memory->next;
 	new_memory_block->prev = memory;
 	new_memory_block->is_free = 1;
-	new_memory_block->magic = 123;
+	new_memory_block->magic = memory->magic;
 	memory->size = size;
 	memory->next = new_memory_block;
 	if (new_memory_block->next)
@@ -114,19 +152,12 @@ t_block 	*find_free_block(size_t size, t_block ** last_block)
 {
 	t_block *cursor;
 
-	//last_block = *memory_list();
 	cursor = *memory_list();
-	//ft_putstr("find_free_block_start!\n");
 	while (cursor && !(cursor->size >= size && cursor->is_free))
 	{
-		//ft_putstr("find free in cycle!\n");
 		*last_block = cursor;
 		cursor = cursor->next;
 	}
-
-	// if (cursor) {
-	// 	last_block = cursor->next;
-	// }
 	return cursor;
 }
 
@@ -141,26 +172,16 @@ t_block 	*add_new_memory_block(size_t size, t_block *last_block)
 	begin = *memory_list();
 	if (*memory_list() == NULL)
 	{
-		//ft_putendl("aaaa!");
 		*memory_list() = new_block;
-		//ft_putendl("aaaa_finish!");
 	}
 	else
 	{
-		//ft_putendl("bbb!");
 		if (last_block)
 			last_block->next = new_block;
 		new_block->prev = last_block;
 		(*memory_list_end()) = new_block;
-		//ft_putstr("add new memory with size:\n");
-		//ft_putstr(ft_itoa_base(new_block->size, 10, 1));
-		//char 	*address = ft_itoa_base((uint64_t)last_block->next, 16, 1);
-		//ft_putstr("0x");
-		//ft_putendl(address);
 	}
 	return new_block;
-	//if(*memory_list() == NULL;
-
 }
 
 void 		initiate_new_block(t_block *new_block, size_t size)
@@ -170,12 +191,10 @@ void 		initiate_new_block(t_block *new_block, size_t size)
 	new_block->prev = NULL;
 	new_block->next = NULL;
 	new_block->magic = 123;
-	//new_block->this = new_block;
 }
 
 t_block 	*memory_fusion(t_block *memory)
 {
-	ft_putstr("memory_fusion\n");
 	if (memory->next && memory->next->is_free)
 	{
 		memory->size += BLOCK_SIZE + memory->next->size;
@@ -187,7 +206,3 @@ t_block 	*memory_fusion(t_block *memory)
 	}
 	return memory;
 }
-// void	split_free_block(t_block *memory, size_t size);
-// {
-//
-// }

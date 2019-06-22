@@ -39,8 +39,8 @@ char	*ft_itoa_base(uint64_t n, int base, int uppercase)
 
 	// if (base < 2 || base > 16 || (base != 10 && n < 0))
 	// 	return (NULL);
-	// if (base == 10)
-	// 	return (ft_itoa(n));
+	/*if (base == 10)
+	  return (ft_itoa(n));*/
 	if (n > 1152921504606846976)
 		length = 15;
 	else

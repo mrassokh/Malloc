@@ -13,32 +13,44 @@
 #include "malloc.h"
 #include <stdio.h>
 
-t_block 	**memory_list()
+t_memory 	*memory_list()
 {
-	static t_block *memory_list;
+	static t_memory memory_list;
 
 	return (&memory_list);
 }
 
+t_block 	**memory_begin()
+{
+	//static t_block *memory_list;
+
+	return (&memory_list()->memory_begin);
+}
+
 t_block 	**tiny_segment()
 {
-	static t_block *tiny_segment;
-
-	return (&tiny_segment);
+	return (&memory_list()->tiny_segment);
+	// static t_block *tiny_segment;
+	//
+	// return (&tiny_segment);
 }
 
 t_block 	**small_segment()
 {
-	static t_block *small_segment;
+	return (&memory_list()->small_segment);
+	/*static t_block *small_segment;
 
-	return (&small_segment);
+	return (&small_segment);*/
 }
 
-t_block 				**memory_list_end()
+t_block 				**memory_end()
 {
-	static t_block *memory_list_end;
+	return (&memory_list()->memory_list_end);
+}
 
-	return (&memory_list_end);
+t_block 			**large_segment()
+{
+	return (&memory_list()->large_segment);
 }
 //static t_block			**mem_list;
 
@@ -119,14 +131,18 @@ void		split_free_page(t_block *memory, size_t size)
 
 	if (size > getpagesize() - BLOCK_SIZE)
 		return;
+	//	ft_putstr("split_free_page_0\n");
 	new_memory_block = MEMORY_DATA(memory) + size;
+	//ft_putstr("split_free_page_0_1\n");
 	new_memory_block->size = getpagesize() - BLOCK_SIZE - size;
+	//ft_putstr("split_free_page_1\n");
 	new_memory_block->next = memory->next;
 	new_memory_block->prev = memory;
 	new_memory_block->is_free = 1;
 	new_memory_block->magic = memory->magic;
 	memory->size = size;
 	memory->next = new_memory_block;
+	//ft_putstr("split_free_page_2\n");
 	if (new_memory_block->next)
 		new_memory_block->next->prev = new_memory_block;
 }
@@ -148,16 +164,18 @@ void		split_free_block(t_block *memory, size_t size)
 		new_memory_block->next->prev = new_memory_block;
 }
 
-t_block 	*find_free_block(size_t size, t_block ** last_block)
+t_block 	*find_free_block(size_t size, t_block ** last_block)//, int preallocate)
 {
 	t_block *cursor;
 
-	cursor = *memory_list();
+	cursor = *memory_begin();
 	while (cursor && !(cursor->size >= size && cursor->is_free))
 	{
+		//if (preallocate)
 		*last_block = cursor;
 		cursor = cursor->next;
 	}
+	//preallocate = 1;
 	return cursor;
 }
 
@@ -169,17 +187,17 @@ t_block 	*add_new_memory_block(size_t size, t_block *last_block)
 	new_block = (t_block*)mmap(NULL, align8(size + BLOCK_SIZE),
 					PROT_READ | PROT_WRITE,	MAP_PRIVATE | MAP_ANON, -1, 0);
 	initiate_new_block(new_block, size);
-	begin = *memory_list();
-	if (*memory_list() == NULL)
+	begin = *memory_begin();
+	if (*memory_begin() == NULL)
 	{
-		*memory_list() = new_block;
+		*memory_begin() = new_block;
 	}
 	else
 	{
 		if (last_block)
 			last_block->next = new_block;
 		new_block->prev = last_block;
-		(*memory_list_end()) = new_block;
+		(*memory_end()) = new_block;
 	}
 	return new_block;
 }

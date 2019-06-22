@@ -45,7 +45,7 @@ SRC_PATH     = src
 ROOT = malloc.c
 
 FUNCTIONS = memory_block.c ft_itoa_base.c ft_strlen.c ft_strrev.c ft_putchar.c\
-ft_memcpy.c ft_putendl.c ft_putstr.c
+ft_memcpy.c ft_putendl.c ft_putstr.c ft_itoa.c ft_strnew.c ft_bzero.c ft_memalloc.c
 
 SRC = $(ROOT) $(FUNCTIONS)
 OBJ=$(SRC:%.c=%.o)

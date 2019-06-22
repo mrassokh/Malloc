@@ -17,12 +17,15 @@
 # define align8(x) (((((x)-1)>>3)<<3)+8)
 # define MEMORY_DATA(m) (m ? (void *)((char*)m + BLOCK_SIZE) : NULL)
 # define GET_BLOCK_POINTER(p) (p ? (void *)((char*)p - BLOCK_SIZE) : NULL)
-# define TINY_ZONE getpagesize() * 12
-# define SMALL_ZONE getpagesize() * 24
-# define TINY_NUM 128
-# define SMALL_NUM 128
+# define PAGE_SIZE getpagesize()
+# define TINY_ZONE_MULT  40
+# define SMALL_ZONE_MULT  4
+# define TINY_ZONE PAGE_SIZE * TINY_ZONE_MULT
+# define SMALL_ZONE PAGE_SIZE * SMALL_ZONE_MULT
+# define TINY_NUM 480
+# define SMALL_NUM 20//8
 # define MAX_TINY_BLOCK_SIZE (TINY_ZONE - TINY_NUM * BLOCK_SIZE) / TINY_NUM
-# define MAX_SMALL_BLOCK_SIZE (SMALL_ZONE - SMALL_NUM * BLOCK_SIZE) / (SMALL_NUM * 10)
+# define MAX_SMALL_BLOCK_SIZE (SMALL_ZONE - SMALL_NUM * BLOCK_SIZE) / (SMALL_NUM )//* 10)
 
 
 //# include <stdio.h>
@@ -43,7 +46,16 @@ typedef struct			s_block
 	//struct s_block		*this;
 	//char 				data [1];
 }						t_block;
-
+//size_t 				count_1 = 1;
+typedef struct			s_memory_list
+{
+	t_block 			*memory_begin;
+	t_block 			*tiny_segment;
+	t_block 			*small_segment;
+	t_block 			*large_segment;
+	t_block 			*memory_list_end;
+	int 				count;
+}						t_memory;
 
 
 //void					free_1(void *ptr);
@@ -55,13 +67,20 @@ void					*realloc(void *ptr, size_t size);
 //void					*realloc_1(void *ptr, size_t size);
 void					*calloc(size_t nitems, size_t size);
 void 					show_alloc_mem();
-void					hello();
+void 					print_block_info(t_block *cursor);
+void 					print_segment_header(t_block *cursor);
+//void					hello();
 
-t_block 				**memory_list();
+//t_block 				**memory_list();
+t_memory			*memory_list();
+t_block 				**memory_begin();
 t_block 				**tiny_segment();
 t_block 				**small_segment();
-t_block 				**memory_list_end();
-t_block					*find_free_block(size_t size, t_block **last_block);
+t_block 				**large_segment();
+//t_block 				**memory_list_end();
+t_block 				**memory_end();
+t_block  				*memory_allocate(size_t size, t_block *last_block);//, int preallocate);
+t_block					*find_free_block(size_t size, t_block **last_block);//, int preallocate);
 t_block 				*add_new_memory_block(size_t size,t_block *last_block);
 void					split_free_block(t_block *memory, size_t size);
 t_block 				*memory_fusion(t_block *memory);
@@ -79,5 +98,9 @@ void	ft_putendl(char const *s);
 void	ft_putchar(char c);
 char	*ft_strrev(char *str);
 size_t	ft_strlen(const char *s);
+char			*ft_itoa(int n);
+char	*ft_strnew(size_t size);
+void	ft_bzero(void *s, size_t n);
+void	*ft_memalloc(size_t size);
 
 #endif

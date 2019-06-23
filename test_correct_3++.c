@@ -19,9 +19,7 @@ int main()
 	strcpy(addr1, "Bonjours\n");
 	print(addr1);
 	addr2 = (char*)malloc(16*M);
-	print("debug1\n");
 	addr3 = (char*)realloc(addr1, 128*M);
-	print("debug2\n");
 	if (!addr3)
 		print("NO ADRR 3\n");
 	addr3[127*M] = 42;

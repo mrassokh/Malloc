@@ -21,7 +21,7 @@ uint64_t	ft_power(uint64_t nb, int power)
 	return (nb * ft_power(nb, power - 1));
 }
 
-int	ft_number_len(uint64_t nb, int base)
+int			ft_number_len(uint64_t nb, int base)
 {
 	int	length;
 
@@ -31,16 +31,12 @@ int	ft_number_len(uint64_t nb, int base)
 	return (length);
 }
 
-char	*ft_itoa_base(uint64_t n, int base, int uppercase)
+char		*ft_itoa_base(uint64_t n, int base, int uppercase)
 {
 	char	*str;
 	int		i;
 	int		length;
 
-	// if (base < 2 || base > 16 || (base != 10 && n < 0))
-	// 	return (NULL);
-	/*if (base == 10)
-	  return (ft_itoa(n));*/
 	if (n > 1152921504606846976)
 		length = 15;
 	else

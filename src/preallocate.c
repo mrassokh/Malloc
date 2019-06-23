@@ -18,7 +18,7 @@ void		preallocate_free_check(void)
 
 	if (memory_list()->count != -1)
 		(memory_list()->count)++;
-	if (memory_list()->count > 150)
+	if (memory_list()->count > 200)
 	{
 		cursor = *tiny_segment();
 		while (cursor && cursor->magic == 456)

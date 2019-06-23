@@ -69,7 +69,6 @@ void		show_alloc_mem(void)
 	size_t	total;
 	char	*total_size;
 
-	ft_putendl("memory list!!!");
 	total = 0;
 	cursor = *memory_begin();
 	if (!cursor)
